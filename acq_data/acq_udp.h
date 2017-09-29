@@ -14,13 +14,13 @@
 #define UDP_DATA      4096                        // UDP pkt DATAsize (bytes)
 #define UDP_PAYLOAD   (UDP_HDR+UDP_DATA)          // UDP pkt total size (bytes) 
 #define NSOCKBUF         3                        // num of accumulate buffers
-#define NACC          1024                        // number of packets to 
+#define NACC          9216*2                        // number of packets to 
                                                   // accumulate per buffer
 #define ACC_BUFSIZE   (NACC*UDP_DATA)             // Data accumulate buffer size
 #define ACC_FLGSIZE    NACC                       // flg accumulate buffer size
-#define FILESIZE        512                       // File size for data storage in MB
+#define FILESIZE      755.1904                       // File size for data storage in MB
 
-#define UDP_IP        "10.0.12.35"                // default ip addr
+#define UDP_IP        "10.10.12.35"                // default ip addr
 #define UDP_PORT       10000                      // default port number
 
 typedef struct {
