@@ -1,2 +1,2 @@
 g++ -g -O3 -fPIC -shared -msse4 -I. -I/include -I/usr/local/include -L. -L/usr/local/lib -lhashpipe -lrt -lm -c filterbank.cpp
-g++  removal.c filterbank.o  -o removal.o
+g++  remove_RFI.c filterbank.o  -o remove_RFI.o

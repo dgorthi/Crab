@@ -781,20 +781,23 @@ bool FilterBankData::WriteHeaderToFile(const char* fname)
 void WriteHeader(const char * fname)
 //void WriteHeader(FILE * fname)
 {
+/*	
 	
-	
-	double Fch1=2100;//1644.72656-.25634765/2.;
+	//double Fch1=2100;//1644.72656-.25634765/2.;
+	double Fch1 = 1644.598386
 	double Foff= -0.25634765;
-	int Nchans=N_CHANS_SPEC;
+	//int Nchans=N_CHANS_SPEC;
+	int Nchans = 1536;
 	float Tsamp= pow(2,8)*8192/2.1/pow(10,9);
 	int Nbits=16;
-/*	
-	double Fch1 = 1644.72656-.25634765/2.
-	double Foff = -.25634765
+*/	
+	//double Fch1 = 1644.72656-.25634765/2.+512*.25634765;
+	double Fch1 = 2100-1536*.25634765+.25634765/2.;
+	double Foff = -.25634765;
 	int Nchans = 1536;
-	float Tsamp = power(2,8)*8192/2.1/pow(10,9);
+	float Tsamp = pow(2,11)*8192/2.1/pow(10,9);
 	int Nbits = 16;
-*/
+
 	int Nifs=1;//N_POLS_CHAN;
 	int start=time((time_t*)NULL);
 	double current_MJD;
@@ -835,10 +838,12 @@ void WriteHeader(const char * fname)
 	//fil.Tstart= 57891.668437;
 	fil.Tsamp=Tsamp;
 	//fil.Tsamp = .0079892;
+	//fil.Fch1=Fch1;
 	fil.Fch1=Fch1;
 	//fil.Fch1 = 2099.87;
 	fil.Foff=Foff;
-	fil.Nchans=Nchans;
+	//fil.Nchans=Nchans;
+	fil.Nchans=1536;
 	fil.Nbits=Nbits;
 	//fil.Nbits=8;
 	fil.Nbeams=1;

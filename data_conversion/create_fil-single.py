@@ -459,9 +459,12 @@ if __name__ == '__main__':
 	#top = int(sys.argv[3])
 
 	os.remove('filename8.txt')
-	os.system('ls data_2017-09-27_15-55-13_315922537 > filename8.txt')
+	os.system('ls /data0/data_sep-27-2017/data_2017-09-27_15-20-12_509768885 > filename8.txt')
 	fp_fn=open("filename8.txt","r")
-
+	filename_r=fp_fn.readline()
+        filename=filename_r[0:-1]
+        #if filename_r=='': break
+        print ("open raw file: %s ..."%filename)
 	#filename = raw_input("Please enter filename to read:\n")
 
 	# Calculate the MJD time from filename
