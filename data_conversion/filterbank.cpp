@@ -20,7 +20,7 @@
 #include "time.h"
 #include "sys/time.h"
 #include <math.h>
-#include <crab_databuf.h>
+#include "crab_databuffer.h"
 
 #define _CHAR_SWAP_SIZE 256
 TimeSeries::TimeSeries(void)

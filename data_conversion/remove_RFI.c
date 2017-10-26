@@ -18,15 +18,15 @@
 #define SINGLE_FILE TRUE			//if TRUE, combines all input files to into a single output file
 
 #define ZERO_NON_BANDPASS TRUE
-#define REMOVE_BAD_CHANNEL FALSE
+#define REMOVE_BAD_CHANNEL TRUE
 #define REPLACE_BAD_ZERO FALSE
 
-#define REMOVE_NARROWBAND_RFI FALSE
+#define REMOVE_NARROWBAND_RFI TRUE
 #define REPLACE_NARROW_ZERO FALSE
 #define PRINT_NARROW_STATS FALSE		//avg, sd, threshold, replacements, etc
 #define PRINT_NARROW_STATS1 FALSE		//which time samples have bad values
 
-#define REMOVE_BROADBAND_RFI FALSE		//if TRUE, REMOVE_NARROWBAND_RFI must be TRUE as well
+#define REMOVE_BROADBAND_RFI TRUE		//if TRUE, REMOVE_NARROWBAND_RFI must be TRUE as well
 #define REPLACE_BROAD_ZERO FALSE
 #define PRINT_BROAD_STATS FALSE			//avg, sd, threshold, replacements, etc.
 #define PRINT_BROAD_STATS1 FALSE		//which time samples have bad values
