@@ -101,7 +101,7 @@ static void *run(hashpipe_thread_args_t * args)
 	        		time(&rawtime);
 			        now = localtime(&rawtime);
 		        	//strftime(f_fil,sizeof(f_fil), "2017_Aug_09/data_%Y-%m-%d_%H-%M-%S.fil",now);
-	        		strftime(f_fil,sizeof(f_fil), "/data0/data_sep-25-1017/data_%Y-%m-%d_%H-%M-%S.fil",now);
+	        		strftime(f_fil,sizeof(f_fil), "/home/lishiyu/data_nov-22-2017/data_%Y-%m-%d_%H-%M-%S.fil",now);
 				WriteHeader(f_fil);
 			        printf("write header done!\n");
 			        crab_file=fopen(f_fil,"a+");

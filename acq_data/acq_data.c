@@ -279,7 +279,7 @@ int transfer_socket_data(SockPar *sockpar){
 
   unsigned int     max_pkt = (FILESIZE*1024*1024)/ACC_BUFSIZE;
   unsigned int     npkt=0,i,idx0,idx,sleep_time;
-  char             filename[50];
+  char             filename[100];
   char             micro[15];
   SockBuf          *idxc;
   FILE             *fp;
@@ -298,7 +298,7 @@ int transfer_socket_data(SockPar *sockpar){
   clock_gettime(CLOCK_MONOTONIC_RAW, &start); 
   uint32_t us = start.tv_nsec;
   sprintf(micro, "%u", us);
-  strftime(filename,sizeof(filename), "/data0/data_sep-27-2017/data_%Y-%m-%d_%H-%M-%S_", now);	
+  strftime(filename,sizeof(filename), "/data1/data_jan-25-2018-0329/data_%Y-%m-%d_%H-%M-%S_", now);	
   strcat(filename,micro);
   fprintf(stderr, "Filename  %s\n", filename);
   fp=fopen(filename,"a+");
@@ -321,7 +321,7 @@ int transfer_socket_data(SockPar *sockpar){
         clock_gettime(CLOCK_MONOTONIC_RAW, &start); 
         uint32_t us = start.tv_nsec;
         sprintf(micro, "%u", us);
-        strftime(filename,sizeof(filename), "/data0/data_sep-27-2017/data_%Y-%m-%d_%H-%M-%S_", now);	
+        strftime(filename,sizeof(filename), "/data1/data_jan-25-2018-0329/data_%Y-%m-%d_%H-%M-%S_", now);	
         strcat(filename,micro);
 	fp=fopen(filename,"a+");
       }

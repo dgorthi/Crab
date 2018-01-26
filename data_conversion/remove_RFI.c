@@ -21,15 +21,15 @@
 #define REMOVE_BAD_CHANNEL TRUE
 #define REPLACE_BAD_ZERO FALSE
 
-#define REMOVE_NARROWBAND_RFI TRUE
+#define REMOVE_NARROWBAND_RFI FALSE
 #define REPLACE_NARROW_ZERO FALSE
-#define PRINT_NARROW_STATS FALSE		//avg, sd, threshold, replacements, etc
-#define PRINT_NARROW_STATS1 FALSE		//which time samples have bad values
+#define PRINT_NARROW_STATS TRUE		//avg, sd, threshold, replacements, etc
+#define PRINT_NARROW_STATS1 TRUE		//which time samples have bad values
 
-#define REMOVE_BROADBAND_RFI TRUE		//if TRUE, REMOVE_NARROWBAND_RFI must be TRUE as well
+#define REMOVE_BROADBAND_RFI FALSE		//if TRUE, REMOVE_NARROWBAND_RFI must be TRUE as well
 #define REPLACE_BROAD_ZERO FALSE
-#define PRINT_BROAD_STATS FALSE			//avg, sd, threshold, replacements, etc.
-#define PRINT_BROAD_STATS1 FALSE		//which time samples have bad values
+#define PRINT_BROAD_STATS TRUE			//avg, sd, threshold, replacements, etc.
+#define PRINT_BROAD_STATS1 TRUE		//which time samples have bad values
 
 #define BOTH_POLS TRUE
 #define XX_POL FALSE
@@ -52,7 +52,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 int main(int argc, char *argv[]){
 	/*This first part of the main function handles the file input of the program. The user must input the directory the data files 
 	they wish to convert to filterbank and/or remove RFI are in  when they call the program (remove_RFI.c /directory_of_files). If the
-	files are al=ready in filterbank then the user should set the RAW_DATA macro to false. Otherwise, if the data is in binary format, 
+	files are already in filterbank then the user should set the RAW_DATA macro to false. Otherwise, if the data is in binary format, 
 	the user should set this macro to true. If the user would additionally like to convert the raw data to filterbank format, they should
 	set the RAW_TO_FIL parameter to true. Lastly, if the user would like to combine multiple input files into a single output file, they
 	should set the SINGLE_FILE macro to be true. 
@@ -63,7 +63,15 @@ int main(int argc, char *argv[]){
         char temp[255], fileName[255], out_file[255], header[363], str[10], c;
 	char *clean = (char *)malloc(sizeof(char)*255);
 	#if BOTH_POLS == TRUE
-        	clean = create_name(argv[1],"reduced/clean1_");
+		#if REMOVE_NARROWBAND_RFI == TRUE
+			clean = create_name(argv[1],"reduced/narrow_clean_");
+		#endif
+		#if REMOVE_BROADBAND_RFI == TRUE
+			clean = create_name(argv[1],"reduced/all_clean_");
+		#endif
+		#if REMOVE_NARROWBAND_RFI == FALSE
+        		clean = create_name(argv[1],"reduced/no_clean2_");
+		#endif
 	#endif
 	#if XX_POL == TRUE
         	clean = create_name(argv[1],"reduced/xx_clean_");
@@ -75,7 +83,7 @@ int main(int argc, char *argv[]){
 	char fil[] = ".fil";
 	int sample_size = UDP_DATA*8, num_fft_channels = 4096, sampling_rate = 2100000000, acc_len = pow(2,11), num_files=0, check, header_len, no_cpy_buf, size, counter = 0;
 	short int  xx, yy, xy_re, xy_im;
-	double random, sampling_time = 2*num_fft_channels*acc_len/(double)sampling_rate;
+	double random, sampling_time = 2*num_fft_channels*acc_len/(double)sampling_rate, percent, file_hour, file_min, file_sec;
 	long n_data_points, num_time_samples, seed = 5;
 	long long f_size, data_size, sum_channels = 0;
 	DIR *p;
@@ -183,7 +191,15 @@ int main(int argc, char *argv[]){
 				strcpy(out_file, create_name(clean, files[i]));
 				#if RAW_TO_FIL == TRUE
 					strcpy(out_file, create_name(out_file,fil));
-					WriteHeader(out_file);	
+					WriteHeader(out_file);
+					/*file_hour = atoi(files[i][16:17])
+					file_minute = atoi(files[i][19:20])
+					file_second = atoi(files[i][22:23])
+					file_MJD = jd + (double)((file_hour-12)/24.0)
+							+(double)(file_minute/1440.0)
+							+(double)(file_second/864000)
+							-(double)2400000.5;	
+					fil.Tstart = file_MJD;*/
 				#endif
 				out = fopen(out_file, "a+");
 				printf("OUTPUT FILENAME: %s\n", out_file);
@@ -254,19 +270,6 @@ int main(int argc, char *argv[]){
 				//Reads data into an array
 //				int size = fread(data, sizeof(short int), n_data_points, fp);
 				for (int ii = 0; ii < no_cpy_buf; ii++){
-//					printf("Copy buffer %d\n", ii);
-/*					
-					for (int jj = 0; jj < ACC_BUFSIZE/2; jj++){
-						size = fread(&xx, sizeof(short int), 1, fp);
-						size = fread(&yy, sizeof(short int), 1, fp);
-						fseek(fp, +2, SEEK_CUR);
-						//size = fread(&xy_re, sizeof(short int), 1, fp);
-						//size = fread(&xy_im, sizeof(short int), 1, fp);
-						data_full[ii*ACC_BUFSIZE/8+jj] = (short int)sqrt(double(xx)*double(xx)+(double)yy*(double)yy);
-	//					printf("Data point: %d, Value: %d\n", jj, data[ii*ACC_BUFSIZE/8+jj]);
-	//					printf("XX: %d, YY: %d, XY_RE: %d, XY_IM: %d, \n\n", xx, yy,xy_re, xy_im);
-					}
-*/					
 					size = fread((data_full+ii*ACC_BUFSIZE/2), sizeof(short int), ACC_BUFSIZE/2, fp);
 					size = fread(flag, sizeof(char), NACC, fp);
 					for (int jj = 0; jj < NACC; jj++){
@@ -279,10 +282,9 @@ int main(int argc, char *argv[]){
 						if (flag[jj] == 1 && ii != 0){
 							printf("Packet number: %d missed, replacing with guassian noise\n", jj);
 							for (int kk = 0; kk < 512*4; kk++){ 
-								/*while(random>.2 || random<-.2){
+								while(random>.2 || random<-.2){
 									random = gasdev(&seed);
-								}*/
-	//							data_full[ii*ACC_BUFSIZE+jj*UDP_DATA+kk] = data_full[(ii-1)*ACC_BUFSIZE+jj*UDP_DATA+kk]*random;
+								}
 								data_full[ii*ACC_BUFSIZE/2+512*4*jj+kk] = data_full[(ii-1)*ACC_BUFSIZE/2+jj*512*4+kk]*random;
 							}
 						}
@@ -299,7 +301,6 @@ int main(int argc, char *argv[]){
 					#if YY_POL == TRUE
 						data[i] = data_full[4*i+1];
 					#endif
-				//	printf("%d\n", data[i]);
 				}
 /*
 				for (int i = 10000; i < 11000; i=i+4){
@@ -382,7 +383,8 @@ int main(int argc, char *argv[]){
 	//					counter += calc_stats_narrow(data, data, channel_avg, channel_SD, num_time_samples, 0, n, n+1, WINDOW_SIZE, CHANNELS_PER_SPEC,0);
 						//printf("Channel %d\n",n);
 					}
-					printf("Number of narrowband samples removed: %d\n", counter);
+					percent = (double)counter/(double)n_data_points;
+					printf("Number of narrowband samples removed: %d (%lf)\n", counter, percent); 
 				#endif
 
 
@@ -413,7 +415,8 @@ int main(int argc, char *argv[]){
 					}
 					counter = remove_broadband_RFI(time_sum, data, channel_avg, channel_SD, 0, num_time_samples, 0, 1, seed, 3);
 //					counter = calc_stats_broad(time_sum, data, channel_avg, channel_SD, num_time_samples, START_CHANNEL, START_CHANNEL, STOP_CHANNEL, WINDOW_SIZE, 1, 0);
-					printf("Number of broadband samples removed: %d\n",counter);
+					percent = (double)counter/(double)num_time_samples;
+					printf("Number of broadband samples removed: %d (%lf )\n",counter, percent); 
 				#endif
 				
 				printf("Writing cleaned data to file %s...\n", out_file);
@@ -492,8 +495,8 @@ void remove_bad_channel(short int data[], int data_len, int start_channel, int s
 		}
 		sd_new = sqrt(m_newS/((stop_channel-start_channel)-1));
 		sd_old = sd_new;
-		thresh_top = m_newM + 2*sd_new;
-		thresh_bottom = m_newM-2*sd_new;
+		thresh_top = m_newM + 1*sd_new;
+		thresh_bottom = m_newM-1*sd_new;
 		#if REPLACE_BAD_ZERO==TRUE
 			for(int n = start_channel; n < stop_channel; n++){
 				if(data[j*num_channel+n] > thresh_top || data[j*num_channel+n] < thresh_bottom){
@@ -508,7 +511,7 @@ void remove_bad_channel(short int data[], int data_len, int start_channel, int s
 					/*while(random>1 || random<-1){
 						random = gasdev(&seed);
 					}*/
-					data[j*num_channel+n] = (short int)(m_newM+sd_new*random);
+					data[j*num_channel+n] = (short int)(m_newM)+m_newM/15*random;
 				}	
 			}
 		#endif	

@@ -3,7 +3,6 @@
 import corr
 import time
 
-
 #HOST = 'rpi-crab.casper.pvt'
 
 HOST = 'rpicrab'
@@ -12,8 +11,8 @@ DEST_IP   = (10<<24) + (10<<16) + (12<<8) + (35<<0)
 DEST_MAC  = 0xe41d2d7dbac1
 DEST_PORT = 10000
 #ACC_LEN   = 2**18 # 2**18 is ~1 second
-#ACC_LEN   = 2**8 #998.6438095238us, 2**8*8192/2100000000.0
-ACC_LEN   = 2**11 #7989.150476us,2**11*8192/2100000000.0
+ACC_LEN   = 2**8 #998.6438095238us, 2**8*8192/2100000000.0
+#ACC_LEN   = 2**11 #7989.150476us,2**11*8192/2100000000.0
 #BOFFILE   = 'adc5g_spec_2017-02-01_1034.bof'
 #BOFFILE   = 'adc5g_spec_2017-02-06_1610.bof'
 #BOFFILE   = 'crab_20170208.bof'
@@ -69,7 +68,14 @@ fpga.write_int('eth_tge_en', 1)
 #fpga.write_int('vacc_shift',56)
 fpga.write_int('vacc_shift',48)
 
-
+print 'Writing all register values to crab_config_params.txt'
+with open('crab_config_params.txt','a+') as fp:
+    fp.write('\n\n%s\n'%time.asctime())
+    fp.write('-------------------\n')
+    for reg in fpga.listdev():
+        val = fpga.read_int(reg)
+        fp.write('%s\t%f\n'%(reg,val))
+    fp.close()
 
 
 

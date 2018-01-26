@@ -1,0 +1,80 @@
+Thu Jan 25 12:33:49 2018Thu Jan 25 12:34:36 2018adc5g_controller	0.000000adc_scope0_snapshot_bram	0.000000adc_scope0_snapshot_ctrl	0.000000adc_scope0_snapshot_status	-2147483648.000000adc_scope1_snapshot_bram	0.000000adc_scope1_snapshot_ctrl	0.000000adc_scope1_snapshot_status	-2147483648.000000eth_dest_ip	168430627.000000eth_dest_port	10000.000000eth_ten_Gbe_v2	17.000000eth_ten_Gbe_v2_txctr	3903.000000eth_ten_Gbe_v2_txofctr	0.000000eth_ten_Gbe_v2_txvldctr	48472.000000eth_tge_en	1.000000filterbank_fft_of	1.000000filterbank_fft_shift	8191.000000pps_arm	0.000000rst	0.000000scope2_snapshot_bram	0.000000scope2_snapshot_ctrl	0.000000scope2_snapshot_status	-2147483648.000000scope3_snapshot_bram	0.000000scope3_snapshot_ctrl	0.000000scope3_snapshot_status	-2147483648.000000sw_pps	0.000000sys_block	12.000000sys_board_id	12.000000sys_clkcounter	705681399.000000sys_rev	12.000000sys_rev_rcs	32.000000sys_scratchpad	0.000000tvg_cmult_en	0.000000tvg_fft_en	0.000000vacc_acc_len	256.000000vacc_shift	48.000000xadc	40352.000000
+
+Thu Jan 25 12:35:42 2018
+-------------------
+adc5g_controller	0.000000
+adc_scope0_snapshot_bram	0.000000
+adc_scope0_snapshot_ctrl	0.000000
+adc_scope0_snapshot_status	-2147483648.000000
+adc_scope1_snapshot_bram	0.000000
+adc_scope1_snapshot_ctrl	0.000000
+adc_scope1_snapshot_status	-2147483648.000000
+eth_dest_ip	168430627.000000
+eth_dest_port	10000.000000
+eth_ten_Gbe_v2	17.000000
+eth_ten_Gbe_v2_txctr	207.000000
+eth_ten_Gbe_v2_txofctr	0.000000
+eth_ten_Gbe_v2_txvldctr	52968.000000
+eth_tge_en	1.000000
+filterbank_fft_of	1.000000
+filterbank_fft_shift	8191.000000
+pps_arm	0.000000
+rst	0.000000
+scope2_snapshot_bram	0.000000
+scope2_snapshot_ctrl	0.000000
+scope2_snapshot_status	-2147483648.000000
+scope3_snapshot_bram	0.000000
+scope3_snapshot_ctrl	0.000000
+scope3_snapshot_status	-2147483648.000000
+sw_pps	0.000000
+sys_block	12.000000
+sys_board_id	12.000000
+sys_clkcounter	630801668.000000
+sys_rev	12.000000
+sys_rev_rcs	32.000000
+sys_scratchpad	0.000000
+tvg_cmult_en	0.000000
+tvg_fft_en	0.000000
+vacc_acc_len	256.000000
+vacc_shift	48.000000
+xadc	40362.000000
+
+
+Thu Jan 25 12:36:34 2018
+-------------------
+adc5g_controller	0.000000
+adc_scope0_snapshot_bram	0.000000
+adc_scope0_snapshot_ctrl	0.000000
+adc_scope0_snapshot_status	-2147483648.000000
+adc_scope1_snapshot_bram	0.000000
+adc_scope1_snapshot_ctrl	0.000000
+adc_scope1_snapshot_status	-2147483648.000000
+eth_dest_ip	168430627.000000
+eth_dest_port	10000.000000
+eth_ten_Gbe_v2	17.000000
+eth_ten_Gbe_v2_txctr	207.000000
+eth_ten_Gbe_v2_txofctr	0.000000
+eth_ten_Gbe_v2_txvldctr	52968.000000
+eth_tge_en	1.000000
+filterbank_fft_of	1.000000
+filterbank_fft_shift	8191.000000
+pps_arm	0.000000
+rst	0.000000
+scope2_snapshot_bram	0.000000
+scope2_snapshot_ctrl	0.000000
+scope2_snapshot_status	-2147483648.000000
+scope3_snapshot_bram	0.000000
+scope3_snapshot_ctrl	0.000000
+scope3_snapshot_status	-2147483648.000000
+sw_pps	0.000000
+sys_block	12.000000
+sys_board_id	12.000000
+sys_clkcounter	806762231.000000
+sys_rev	12.000000
+sys_rev_rcs	32.000000
+sys_scratchpad	0.000000
+tvg_cmult_en	0.000000
+tvg_fft_en	0.000000
+vacc_acc_len	256.000000
+vacc_shift	48.000000
+xadc	40348.000000

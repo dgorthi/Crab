@@ -430,6 +430,9 @@ void FilterBankData::PrintHeader(void)
 	cout<<"Za_start"<<"\t"<< Za_start<<endl;
 	cout<<"Src_raj"<<"\t"<< Src_raj<<endl;
 	cout<<"Src_dej"<<"\t"<< Src_dej<<endl;
+	cout<<"Za_start"<<"\t"<< Za_start<<endl;
+	cout<<"Src_raj"<<"\t"<< Src_raj<<endl;
+	cout<<"Src_dej"<<"\t"<< Src_dej<<endl;
 	cout<<"Gal_l"<<"\t"<< Gal_l<<endl;
 	cout<<"Gal_b"<<"\t"<< Gal_b<<endl;
 	cout<<"Header_tobs"<<"\t"<< Header_tobs<<endl;
@@ -792,12 +795,11 @@ void WriteHeader(const char * fname)
 	int Nbits=16;
 */	
 	//double Fch1 = 1644.72656-.25634765/2.+512*.25634765;
-	double Fch1 = 2100-1536*.25634765+.25634765/2.;
 	double Foff = -.25634765;
+	double Fch1 = 2100 + 1536*Foff - Foff/2.;
 	int Nchans = 1536;
-	float Tsamp = pow(2,11)*8192/2.1/pow(10,9);
+	float Tsamp = pow(2,8)*8192/2.1/pow(10,9);
 	int Nbits = 16;
-
 	int Nifs=1;//N_POLS_CHAN;
 	int start=time((time_t*)NULL);
 	double current_MJD;
@@ -813,7 +815,6 @@ void WriteHeader(const char * fname)
 	Year=p->tm_year+1900;
 	Month=p->tm_mon+1;
 	Day=p->tm_mday;
-
 	//const char * fname= "filterbank-test";
 	//Start to allocate the header information
 	//long int header_size=sizeof(_MEMELEM)*Nseg;
@@ -822,20 +823,20 @@ void WriteHeader(const char * fname)
 	current_MJD= jd+(double)((p->tm_hour-12)/24.0)
                                +(double)(p->tm_min/1440.0)
                                +(double)(p->tm_sec/86400.0)
-                               +(double)(currenttime.tv_usec/86400.0/1000000.0)
+        //                       +(double)(currenttime.tv_usec/86400.0/1000000.0)
                                -(double)2400000.5;
 	FilterBankData fil;
 	strcpy(fil.Source_name, "B0329+54");
 	fil.UseFrequencyTable=false;
-	//fil.Telescope_id=1;
-	//fil.Machine_id=1;
+	fil.Telescope_id=1;
+	fil.Machine_id=1;
 	fil.Data_type=1;
 	fil.Az_start=0;
 	fil.Za_start=0;
-	fil.Src_dej=0;
-	fil.Src_raj=0;
-	fil.Tstart=current_MJD;
-	//fil.Tstart= 57891.668437;
+	fil.Src_dej=543444.9;
+	fil.Src_raj=033259.37;
+	//fil.Tstart=current_MJD;
+	fil.Tstart= 58104.8475862;
 	fil.Tsamp=Tsamp;
 	//fil.Tsamp = .0079892;
 	//fil.Fch1=Fch1;
