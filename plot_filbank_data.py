@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 import numpy as np
 from sigpyproc.Readers import FilReader
 import matplotlib.pyplot as plt
@@ -15,7 +16,8 @@ parser.add_argument('-t','--time',action='store_true',default=False,
                     help='Plot a time series (average over freq axis)')
 parser.add_argument('-f','--frequency',action='store_true',default=False,
                     help='Plot a spectrum averaged over the time samples provided')
-
+parser.add_argument('--save', type=str, default=None,
+                    help='Save the plot with the provided filename as a pdf file')
 args = parser.parse_args()
 
 # Open filterbank file and 
@@ -36,7 +38,16 @@ if args.frequency:
 
     fig,ax = plt.subplots(1,1)
     for k,v in filbank.items():
+	stats = []
+	stats.append("%0.3e"%((np.mean(np.sum(v, axis = 1)[300:1200]))))
+	stats.append("%0.3e"%((np.median(np.sum(v, axis = 1)[300:1200]))))
+	stats.append("%0.3e"%((np.std(np.sum(v, axis = 1)[300:1200]))))
         ax.semilogy(freq,np.sum(v,axis=1),label=k)
+	#plt.figtext(1, 0.8, 'Mean: ' + str(stats[0]) + '\nMedian: ' + str(stats[1]) + '\nSTD: ' + str(stats[2]))
+	print(k)
+	print('Mean: ' + str(stats[0]) + '\nMedian: ' + str(stats[1]) + '\nSTD: ' + str(stats[2])+ '\n\n')
+    ax.set_ylabel('Log amplitude',fontsize=22)
+    ax.set_xlabel('Frequency channel',fontsize=22)
     ax.legend()
 
 elif args.time:
@@ -44,13 +55,20 @@ elif args.time:
     for k,v in filbank.items():
         ts = np.sum(v,axis=0)
         md = np.median(ts)
-        ax.plot(ts-md,label=k)
+        ax.plot(ts-md,label=k, alpha = 0.5)
+    ax.set_ylabel('Amplitude',fontsize=22)
+    ax.set_xlabel('Time',fontsize=22)
     ax.legend()
 
 else:
     fig,ax = plt.subplots(1,len(filbank.keys()))
     for i,d in enumerate(filbank.items()):
-        ax[i].imshow(d[1])
-        ax[i].set_title(d[0])
+	print(d)
+        im = ax.imshow(d[1])
+        ax.set_title(d[0])
+        fig.colorbar(im)
+
+if args.save:
+    fig.savefig(args.save+'.pdf')
 
 plt.show()

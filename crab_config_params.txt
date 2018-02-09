@@ -78,3 +78,83 @@ tvg_fft_en	0.000000
 vacc_acc_len	256.000000
 vacc_shift	48.000000
 xadc	40348.000000
+
+
+Wed Feb  7 23:53:55 2018
+-------------------
+adc5g_controller	0.000000
+adc_scope0_snapshot_bram	0.000000
+adc_scope0_snapshot_ctrl	0.000000
+adc_scope0_snapshot_status	-2147483648.000000
+adc_scope1_snapshot_bram	0.000000
+adc_scope1_snapshot_ctrl	0.000000
+adc_scope1_snapshot_status	-2147483648.000000
+eth_dest_ip	168430627.000000
+eth_dest_port	10000.000000
+eth_ten_Gbe_v2	17.000000
+eth_ten_Gbe_v2_txctr	1927.000000
+eth_ten_Gbe_v2_txofctr	0.000000
+eth_ten_Gbe_v2_txvldctr	17824.000000
+eth_tge_en	1.000000
+filterbank_fft_of	1.000000
+filterbank_fft_shift	8191.000000
+pps_arm	0.000000
+rst	0.000000
+scope2_snapshot_bram	0.000000
+scope2_snapshot_ctrl	0.000000
+scope2_snapshot_status	-2147483648.000000
+scope3_snapshot_bram	0.000000
+scope3_snapshot_ctrl	0.000000
+scope3_snapshot_status	-2147483648.000000
+sw_pps	0.000000
+sys_block	12.000000
+sys_board_id	12.000000
+sys_clkcounter	688414563.000000
+sys_rev	12.000000
+sys_rev_rcs	32.000000
+sys_scratchpad	0.000000
+tvg_cmult_en	0.000000
+tvg_fft_en	0.000000
+vacc_acc_len	256.000000
+vacc_shift	48.000000
+xadc	40630.000000
+
+
+Thu Feb  8 00:00:55 2018
+-------------------
+adc5g_controller	0.000000
+adc_scope0_snapshot_bram	0.000000
+adc_scope0_snapshot_ctrl	0.000000
+adc_scope0_snapshot_status	-2147483648.000000
+adc_scope1_snapshot_bram	0.000000
+adc_scope1_snapshot_ctrl	0.000000
+adc_scope1_snapshot_status	-2147483648.000000
+eth_dest_ip	168430627.000000
+eth_dest_port	10000.000000
+eth_ten_Gbe_v2	17.000000
+eth_ten_Gbe_v2_txctr	7119.000000
+eth_ten_Gbe_v2_txofctr	0.000000
+eth_ten_Gbe_v2_txvldctr	59880.000000
+eth_tge_en	1.000000
+filterbank_fft_of	0.000000
+filterbank_fft_shift	8191.000000
+pps_arm	0.000000
+rst	0.000000
+scope2_snapshot_bram	0.000000
+scope2_snapshot_ctrl	0.000000
+scope2_snapshot_status	-2147483648.000000
+scope3_snapshot_bram	0.000000
+scope3_snapshot_ctrl	0.000000
+scope3_snapshot_status	-2147483648.000000
+sw_pps	0.000000
+sys_block	12.000000
+sys_board_id	12.000000
+sys_clkcounter	931538799.000000
+sys_rev	12.000000
+sys_rev_rcs	32.000000
+sys_scratchpad	0.000000
+tvg_cmult_en	0.000000
+tvg_fft_en	0.000000
+vacc_acc_len	256.000000
+vacc_shift	48.000000
+xadc	41307.000000

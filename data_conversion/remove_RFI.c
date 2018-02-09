@@ -18,25 +18,25 @@
 #define SINGLE_FILE TRUE			//if TRUE, combines all input files to into a single output file
 
 #define ZERO_NON_BANDPASS TRUE
-#define REMOVE_BAD_CHANNEL TRUE
+#define REMOVE_BAD_CHANNEL FALSE
 #define REPLACE_BAD_ZERO FALSE
 
 #define REMOVE_NARROWBAND_RFI FALSE
 #define REPLACE_NARROW_ZERO FALSE
-#define PRINT_NARROW_STATS TRUE		//avg, sd, threshold, replacements, etc
-#define PRINT_NARROW_STATS1 TRUE		//which time samples have bad values
+#define PRINT_NARROW_STATS FALSE		//avg, sd, threshold, replacements, etc
+#define PRINT_NARROW_STATS1 FALSE		//which time samples have bad values
 
 #define REMOVE_BROADBAND_RFI FALSE		//if TRUE, REMOVE_NARROWBAND_RFI must be TRUE as well
 #define REPLACE_BROAD_ZERO FALSE
-#define PRINT_BROAD_STATS TRUE			//avg, sd, threshold, replacements, etc.
-#define PRINT_BROAD_STATS1 TRUE		//which time samples have bad values
+#define PRINT_BROAD_STATS FALSE			//avg, sd, threshold, replacements, etc.
+#define PRINT_BROAD_STATS1 FALSE		//which time samples have bad values
 
-#define BOTH_POLS TRUE
-#define XX_POL FALSE
+#define BOTH_POLS FALSE
+#define XX_POL TRUE
 #define YY_POL FALSE
 
-#define START_CHANNEL 240			//1800 if spectrum contains 4096 channels, 300 (240) if 1536 channels
-#define STOP_CHANNEL 1264			//2730 if spectrum contains 4096 channels, 1230 (1264) if 1536 channes 2270-2730
+#define START_CHANNEL 280			//1800 if spectrum contains 4096 channels, 300 (240) if 1536 channels
+#define STOP_CHANNEL 1200			//2730 if spectrum contains 4096 channels, 1230 (1264) if 1536 channes 2270-2730
 #define WINDOW_SIZE 1000
 #define CHANNELS_PER_SPEC 1536			//1536 or 4096
 
@@ -63,14 +63,17 @@ int main(int argc, char *argv[]){
         char temp[255], fileName[255], out_file[255], header[363], str[10], c;
 	char *clean = (char *)malloc(sizeof(char)*255);
 	#if BOTH_POLS == TRUE
+		#if REMOVE_BAD_CHANNEL == FALSE
+        		clean = create_name(argv[1],"reduced/no_clean_");
+		#endif
+		#if REMOVE_BAD_CHANNEL == TRUE
+        		clean = create_name(argv[1],"reduced/bad_channels_removed_");
+		#endif
 		#if REMOVE_NARROWBAND_RFI == TRUE
 			clean = create_name(argv[1],"reduced/narrow_clean_");
 		#endif
 		#if REMOVE_BROADBAND_RFI == TRUE
 			clean = create_name(argv[1],"reduced/all_clean_");
-		#endif
-		#if REMOVE_NARROWBAND_RFI == FALSE
-        		clean = create_name(argv[1],"reduced/no_clean2_");
 		#endif
 	#endif
 	#if XX_POL == TRUE
@@ -333,8 +336,7 @@ int main(int argc, char *argv[]){
 
 			/*
 			RFI removal is done by a threshold test. For each channel, if the current time sample of interest
-			is > WINDOW_SIZE+start_time sample  number of time samples, the average and standard deviation for the threshold test is 
-			calculated from the preceeding WINDOW_SIZE number of time samples. If the current time sample of interest
+			is > WINDOW_SIZE+start_time sample  number of time samples, the average and standard deviation for the threshold 			 test is calculated from the preceeding WINDOW_SIZE number of time samples. If the current time sample of interest
 			is within the first WINDOW_SIZE+start_time number of time samples, then the statistics for that channel at
 			that time sample for the threshold test are calculated from the first WINDOW_SIZE number of time samples. 
 			If the current time sample of interest is within the last WINDOW_SIZE number of time samples, then the
@@ -378,13 +380,13 @@ int main(int argc, char *argv[]){
 					*/ 
 					counter = 0;
 					printf("Removing narrowband RFI\n");
-					for(int n = START_CHANNEL; n < STOP_CHANNEL; n++){
-						counter += remove_narrowband_RFI(data, data, channel_avg, channel_SD, 0, num_time_samples, n, CHANNELS_PER_SPEC, seed, 3);
-	//					counter += calc_stats_narrow(data, data, channel_avg, channel_SD, num_time_samples, 0, n, n+1, WINDOW_SIZE, CHANNELS_PER_SPEC,0);
+					for(int n = START_CHANNEL; n <= STOP_CHANNEL; n++){
+						counter += remove_narrowband_RFI(data, data, channel_avg, channel_SD, 0, num_time_samples, n, CHANNELS_PER_SPEC, seed, 1.5);
+						//remove_narrowband_RFI(short int input[], short int output[], double avg[], double sd[], long start_time, long num_samples, int channel, int channels_per_samp, long seed, double thresh_limit){
 						//printf("Channel %d\n",n);
 					}
-					percent = (double)counter/(double)n_data_points;
-					printf("Number of narrowband samples removed: %d (%lf)\n", counter, percent); 
+					percent = (double)counter/(double)(num_time_samples*(STOP_CHANNEL-START_CHANNEL))*100;
+					printf("Number of narrowband samples removed: %d %lf %% \n", counter, percent); 
 				#endif
 
 
@@ -404,7 +406,7 @@ int main(int argc, char *argv[]){
 					counter = 0;
 					printf("Removing broadband RFI\n");
 					for(int j = 0; j < num_time_samples; j++){
-						for(int k = START_CHANNEL; k< STOP_CHANNEL; k++){
+						for(int k = START_CHANNEL; k<= STOP_CHANNEL; k++){
 							//printf("DATA VALUE: %d\n", I[num_channel_per_spec*j+k]);
 							//printf("AVG VALUE %d\n\n", (short int)channel_avg[num_channel_per_spec*j+k]);
 							sum_channels += data[CHANNELS_PER_SPEC*j+k];
@@ -413,10 +415,10 @@ int main(int argc, char *argv[]){
 			//			printf("TIME_SUM: %f\n\n", time_sum[j]);
 						sum_channels = 0;
 					}
-					counter = remove_broadband_RFI(time_sum, data, channel_avg, channel_SD, 0, num_time_samples, 0, 1, seed, 3);
-//					counter = calc_stats_broad(time_sum, data, channel_avg, channel_SD, num_time_samples, START_CHANNEL, START_CHANNEL, STOP_CHANNEL, WINDOW_SIZE, 1, 0);
-					percent = (double)counter/(double)num_time_samples;
-					printf("Number of broadband samples removed: %d (%lf )\n",counter, percent); 
+					counter = remove_broadband_RFI(time_sum, data, channel_avg, channel_SD, 0, num_time_samples, 0, 1, seed, 1.5);
+					//int remove_broadband_RFI(double input[], short int output[], double avg[], double sd[], long start_time, long num_samples, int channel, int channels_per_samp, long seed, double thresh_limit){
+					percent = (double)counter/(double)num_time_samples*100;
+					printf("Number of broadband samples removed: %d %lf %% \n",counter, percent); 
 				#endif
 				
 				printf("Writing cleaned data to file %s...\n", out_file);
@@ -537,7 +539,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 	}
 
 
-	for(long j = start_time; j < (num_samples-start_time-1); j++){
+	for(long j = start_time; j < (num_samples-start_time); j++){
 		if (j == start_time){
 			/*Calculate stats for first WINDOW_SIZE time samples*/
 			M = 0;
@@ -549,30 +551,40 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 				M = M + (current_sample-M)/k;
 				S = S + (current_sample-M)*(current_sample-oldM);
 			}
+			
 			V = S/(WINDOW_SIZE-1);
 			SD = sqrt(V);
-			thresh_top = M + thresh_limit*S;
-			thresh_bottom = M - thresh_limit*S;
+			thresh_top = M + thresh_limit*SD;
+			thresh_bottom = M - thresh_limit*SD;
 
 			/*Compare first thousand time samples to threshold limits and replace with either 0 or noise if outside*/
 			for(int k = 0; k < WINDOW_SIZE; k++){
 				current_index = k*channels_per_samp+channel;
 				current_sample = (double)input[current_index];
 				window[k] = current_sample;
+				#if PRINT_NARROW_STATS == TRUE
+					printf("Current time sample:%d, and channel: %d\n", k, channel);
+					printf("Mean: %f\n", M);
+					printf("Standard deviation: %f\n", SD);
+					printf("Input value: %d\n", input[current_index]);
+					printf("Replaced input value (for stat calc): %f\n", current_sample);
+					printf("Next value: %f\n", next_sample);
+					printf("Threshold top: %f\n", thresh_top);
+					printf("Threshold bottom: %f\n\n", thresh_bottom);
+				#endif
+				/*#if PRINT_NARROW_STATS == TRUE
+					printf("Current time sample:%d, and channel: %d\n", k, channel);
+					printf("Original mean: %f\n", M);
+					printf("Original standard deviation: %f\n", SD);
+					printf("Input value: %d\n", input[current_index]);
+					printf("Original window value: %f", window[k]);
+				#endif*/
 				if(current_sample > thresh_top || current_sample < thresh_bottom){
 					#if PRINT_NARROW_STATS1 == TRUE
 						printf("******************************************************************\n");
 						printf("HITTTT!!!!!!!!\n");
 						printf("Current time sample:%ld, and channel: %d\n", j, channel);
 						printf("*******************************************************************\n");
-					#endif
-					#if PRINT_NARROW_STATS == TRUE
-						printf("HIT!!!!!!!!!!\n");
-						printf("Current time sample:%d, and channel: %d\n", k, channel);
-						printf("Original mean: %f\n", M);
-						printf("Original standard deviation: %f\n", SD);
-						printf("Input value: %d\n", input[current_index]);
-						printf("Original window value: %f", window[k]);
 					#endif
 					/*Increase counter for RFI detection*/
 					counter++;
@@ -582,12 +594,12 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 					/*while(random>1 || random<(-1)){
 						random = gasdev(&seed);
 					}*/
-					window[k] = M + SD*random;
+					window[WINDOW_SIZE-1] = M + random*M/15; //*SD;
 					#if REPLACE_NARROW_ZERO == TRUE
 							output[current_index] = 0;
 					#endif
 					#if REPLACE_NARROW_ZERO == FALSE
-							output[current_index] = (short int)window[k];
+							output[current_index] = (short int)window[WINDOW_SIZE-1];
 					#endif
 					#if PRINT_NARROW_STATS == TRUE
 						printf("Output value: %d\n", output[current_index]);
@@ -622,6 +634,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 					printf("Final standard deviation value: %f\n\n", sd[current_index]);
 				}
 			#endif
+
 		}
 
 		/*Begin calculation of rolling avg and sd*/
@@ -665,6 +678,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 				printf("Threshold top: %f\n", thresh_top);
 				printf("Threshold bottom: %f\n\n", thresh_bottom);
 			#endif
+
 			/*Replace bad values*/
 			if(next_sample > thresh_top || next_sample < thresh_bottom){
 				#if PRINT_NARROW_STATS1 == TRUE
@@ -681,7 +695,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 				/*while(random>1 || random<(-1)){
 					random = gasdev(&seed);
 				}*/
-				window[WINDOW_SIZE-1] = M + SD*random;
+				window[WINDOW_SIZE-1] = M + random*M/15; //*SD;
 
 				#if REPLACE_NARROW_ZERO == TRUE
 					output[next_index] = 0;
@@ -702,7 +716,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 		}
 		
 		/*For last WINDOW_SIZE samples, use stats calculated from the last WINDOW_SIZE samples before sample num_samples-WINDOW_SIZE*/
-		if (j >= WINDOW_SIZE){
+		if (j >= num_samples-WINDOW_SIZE){
 			current_index = j*channels_per_samp+channel;
 			next_index = (j+1)*channels_per_samp+channel;
 			next_sample = input[next_index];
@@ -726,7 +740,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 				/*while(random>1 || random<(-1)){
 					random = gasdev(&seed);
 				}*/
-				window[WINDOW_SIZE-1] = M + SD*random;
+				window[WINDOW_SIZE-1] = M + random*M/15; //*S;
 
 				#if REPLACE_NARROW_ZERO == TRUE
 					output[next_index] = 0;
@@ -746,6 +760,7 @@ int remove_narrowband_RFI(short int input[], short int output[], double avg[], d
 					
 /*Removes broadband RFI by simple threshold test*/
 int remove_broadband_RFI(double input[], short int output[], double avg[], double sd[], long start_time, long num_samples, int channel, int channels_per_samp, long seed, double thresh_limit){
+	//counter = remove_broadband_RFI(time_sum, data, channel_avg, channel_SD, 0, num_time_samples, 0, 1, seed, 1.5);
 	/*
 	If time sample is < start_time+WINDOW_SIZE, the average and standard deviation are calculated according to the algorithm described in 
 	http://jonisalonen.com/2013/deriving-welfords-method-for-computing-variance/
@@ -777,8 +792,8 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 			}
 			V = S/(WINDOW_SIZE-1);
 			SD = sqrt(V);
-			thresh_top = M + thresh_limit*S;
-			thresh_bottom = M - thresh_limit*S;
+			thresh_top = M + thresh_limit*SD;
+			thresh_bottom = M - thresh_limit*SD;
 
 			/*Compare first thousand time samples to threshold limits and replace with either 0 or noise if outside*/
 			for(int k = 0; k < WINDOW_SIZE; k++){
@@ -794,7 +809,7 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 					#endif
 					#if PRINT_BROAD_STATS == TRUE
 						printf("HIT!!!!!!!!!!\n");
-						printf("Current time sample: %d\n", j);
+						printf("Current time sample: %ld\n", j);
 						printf("Original mean: %f\n", M);
 						printf("Original standard deviation: %f\n", SD);
 						printf("Input value: %f\n", input[current_index]);
@@ -805,22 +820,22 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 					
 					/*Replace bad stat window value with noise*/
 					random = gasdev(&seed);
-					/*while(random>1 || random<(-1)){
+	 				/*while(random>1 || random<(-1)){
 						random = gasdev(&seed);
 					}*/
-					window[k] = M + SD*random;
+					window[WINDOW_SIZE-1] = M + M*random/15; //*S;
 
 					#if REPLACE_BROAD_ZERO == TRUE
 						for(int l = START_CHANNEL; l < STOP_CHANNEL; l++){
-							next_index = (j+1)*CHANNELS_PER_SPEC+channel+k;
+							next_index = (j+k)*CHANNELS_PER_SPEC+l;
 							output[next_index] = 0;
 						}
 					#endif
 					#if REPLACE_BROAD_ZERO == FALSE
 						for(int l = START_CHANNEL; l < STOP_CHANNEL; l++){
 							random = gasdev(&seed);
-							next_index = (j+1)*CHANNELS_PER_SPEC+channel+k;
-							output[next_index] = avg[next_index]+random*sd[next_index];
+							current_index = (j+k)*CHANNELS_PER_SPEC+l;
+							output[current_index] = avg[current_index]+random*avg[current_index]/35; //sd[next_index];
 						}
 					#endif
 
@@ -842,14 +857,14 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 			SD = sqrt(V);
 	
 			/*Update statistics array*/
-			/*
+			
 			for(int k = 0; k < WINDOW_SIZE; k++){
 				current_index = k*channels_per_samp+channel;
 				avg[current_index] = M;
 				sd[current_index] = SD;
 			}
 			oldM = M;
-			*/
+			
 
 			#if PRINT_BROAD_STATS == TRUE
 				for(int k = 0; k < WINDOW_SIZE; k++){
@@ -921,7 +936,7 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 				/*while(random>1 || random<(-1)){
 					random = gasdev(&seed);
 				}*/
-				window[WINDOW_SIZE-1] = M + SD*random;
+				window[WINDOW_SIZE-1] = M + M*random/15; //*SD;
 
 				#if REPLACE_BROAD_ZERO == TRUE
 					for(int k = START_CHANNEL; k < STOP_CHANNEL; k++){
@@ -932,8 +947,8 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 				#if REPLACE_BROAD_ZERO == FALSE
 					for(int k = START_CHANNEL; k < STOP_CHANNEL; k++){
 						random = gasdev(&seed);
-						next_index = (j+1)*CHANNELS_PER_SPEC+channel+k;
-						output[next_index] = avg[next_index]+random*sd[next_index];
+						next_index = (j+1)*CHANNELS_PER_SPEC+k;
+						output[next_index] = avg[next_index]+avg[next_index]*random/35; //*sd[next_index];
 					}
 				#endif
 
@@ -949,7 +964,7 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 		}
 		
 		/*For last WINDOW_SIZE samples, use stats calculated from the last WINDOW_SIZE samples before sample num_samples-WINDOW_SIZE*/
-		if (j >= WINDOW_SIZE){
+		if (j >= num_samples-WINDOW_SIZE){
 			current_index = j*channels_per_samp+channel;
 			next_index = (j+1)*channels_per_samp+channel;
 			next_sample = input[next_index];
@@ -973,7 +988,7 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 				/*while(random>1 || random<(-1)){
 					random = gasdev(&seed);
 				}*/
-				window[WINDOW_SIZE-1] = M + SD*random;
+				window[WINDOW_SIZE-1] = M + M*random/15; //*SD;
 
 				#if REPLACE_BROAD_ZERO == TRUE
 					for(int k = START_CHANNEL; k < STOP_CHANNEL; k++){
@@ -984,8 +999,8 @@ int remove_broadband_RFI(double input[], short int output[], double avg[], doubl
 				#if REPLACE_BROAD_ZERO == FALSE
 					for(int k = START_CHANNEL; k < STOP_CHANNEL; k++){
 						random = gasdev(&seed);
-						next_index = (j+1)*CHANNELS_PER_SPEC+channel+k;
-						output[next_index] = avg[next_index]+random*sd[next_index];
+						next_index = (j+1)*CHANNELS_PER_SPEC+k;
+						output[next_index] = avg[next_index]+random*avg[next_index]/35; //sd[next_index];
 					}
 				#endif
 			}
